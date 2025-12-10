@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                                  /* JavaScript version. */
+    "module": "NodeNext",                                /* Critical for "type": "module" support. */
+    "moduleResolution": "NodeNext",                      /* Critical for "type": "module" support. */
+    "outDir": "./dist",                                  
+    "rootDir": "./src",                                  
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    "esModuleInterop": true,                             
+    "skipLibCheck": true,                                 
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+  },
+  
+  "include": ["src/**/*"]
+}

@@ -1,0 +1,6 @@
+pytest
+pyjwt[crypto]
+argon2-cffi
+fastapi
+httpx
+psycopg[binary]
