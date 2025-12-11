@@ -8,7 +8,7 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "exec": "tsx src/index.ts",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
