@@ -1,26 +1,28 @@
-//import express from 'express';
+import express from 'express';
 import { connectToDatabase } from './mongo-client.js';
+import router  from './routes/api.js'
 
 // ToDo:
-//  1- API 
+//  1- API --> Define a router in other file and import it here.
 
 
 
-//const app = express();
+const app = express();
+const port = 3000;
 
 const start = async () => {
   // 1. Open the connection pool
-  await connectToDatabase(); 
-  
-  // 2. Start listening for requests
-  /*
-  app.listen(3000, () => {
-    console.log('Server running on 3000');
-});
-  // Somehow the API will check if the user is authenticated.
+  await connectToDatabase(); // at some point should be closed.
 
+  app.use(express.json()); // Middleware to parse JSON bodies
 
-*/ 
+  // MOUNT THE ROUTER
+  // Any request starting with '/users' goes to the userRouter
+  app.use('/', router); 
+
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
 };
 
 start();

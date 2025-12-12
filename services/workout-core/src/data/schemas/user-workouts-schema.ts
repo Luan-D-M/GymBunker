@@ -6,5 +6,9 @@
         type: String, required: true,
         unique: true,  // Also enforces indexing for this field
     },
-    workouts:[WorkoutSchema],
+    workouts: {
+        type: [WorkoutSchema],
+        required: true,
+        default: []
+    }
  });

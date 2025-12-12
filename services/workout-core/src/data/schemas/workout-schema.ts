@@ -3,7 +3,11 @@
  
  export const WorkoutSchema = new Schema({
     workout_name: { type: String, required: true, unique: true },
-    exercises: [ExerciseSchema], 
+    exercises: {
+      type: [ExerciseSchema],
+      required: true,
+      default: []
+   }, 
  }, { _id: false });
 
 
