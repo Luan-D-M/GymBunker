@@ -1,7 +1,3 @@
-pyjwt[crypto]
-argon2-cffi
-fastapi
-httpx
-psycopg[binary]
+# To generate files so it is possible to build a gRPC client.
 betterproto[compiler] # https://github.com/danielgtaylor/python-betterproto
-grpclib
+grpcio-tools

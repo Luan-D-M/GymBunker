@@ -15,16 +15,21 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@bufbuild/buf": "^1.61.0",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
+    "grpc_tools_node_protoc_ts": "^5.3.3",
+    "grpc-tools": "^1.13.1",
     "jest": "^30.2.0",
     "mongodb-memory-server": "^10.4.1",
+    "protoc-gen-js": "^3.21.4-4",
     "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.3",
     "express": "^5.2.1",
     "mongoose": "^9.0.1"
   }

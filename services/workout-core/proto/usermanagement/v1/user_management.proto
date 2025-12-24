@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package usermanagement.v1;
+
+message CreateUserRequest {
+  string id = 1;
+}
+message CreateUserResponse {}
+
+
+message DeleteUserRequest {
+  string id = 1;
+}
+message DeleteUserResponse {}
+
+service UserManagementService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
+}
+

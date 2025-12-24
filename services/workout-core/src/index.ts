@@ -1,6 +1,6 @@
 import express from 'express';
 import { connectToDatabase } from './mongo-client.js';
-import router  from './routes/api.js'
+import router  from './routes/public-api.js'
 
 // ToDo:
 //  1- API --> Define a router in other file and import it here.

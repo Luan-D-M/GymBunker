@@ -1,8 +1,20 @@
 import pytest
+from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 from auth_api import app
 from dependencies import get_user_repository
 from repository import MockRepository
+
+@pytest.fixture(autouse=True)
+def mock_grpc():
+    """
+    Prevents the real gRPC calls from running during tests.
+    """
+    with patch('auth_api.create_user', new_callable=AsyncMock) as mock_create, \
+         patch('auth_api.delete_user', new_callable=AsyncMock) as mock_delete:
+        # yield keeps the 'with' block open, ensuring patches remain active 
+        # for the duration of the tests execution.
+        yield mock_create, mock_delete  
 
 @pytest.fixture(autouse=True)
 def override_repository():

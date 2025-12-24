@@ -30,7 +30,7 @@ class PostgresqlUserRepository(UserRepository):
 
         # AsyncConnectionPool would have better performance
         async with psycopg.AsyncConnection.connect(**self.__conn_details) as conn:
-                yield conn.cursor()
+            yield conn.cursor()
         
 
     async def get(self, username: str) -> User | None:

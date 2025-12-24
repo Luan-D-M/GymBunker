@@ -4,3 +4,5 @@ argon2-cffi
 fastapi
 httpx
 psycopg[binary]
+betterproto[compiler]
+grpclib

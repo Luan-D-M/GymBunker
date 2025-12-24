@@ -4,6 +4,7 @@ from api_models import UserSignUp, UserLogIn, UserDeleteAccount
 from dependencies import get_auth_manager, get_jwt_util
 from auth_manager import AuthManager
 from jwt_utils import JWTUtil
+from grpc_client import create_user, delete_user
 
 app = FastAPI()
 
@@ -22,6 +23,15 @@ async def signup(
     await auth_manager.hash_password_and_store_user_in_database(
         user.username, user.password
     )
+    try:
+        await create_user(user.username)
+    except Exception:
+        # Clean up the local DB so the user can try again later
+        await auth_manager.delete_user(user.username)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail='Service is unavailable'
+        )
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
@@ -103,6 +113,12 @@ async def delete_account(
         )
 
     await auth_manager.delete_user(token_data["username"])
+    try:
+        await delete_user(token_data["username"])
+    except Exception as e:
+        # Doesnt raise an error here because the account is effectively deleted for the user.
+        pass
+        # ToDo: Logging? Queue for deletion later?
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
