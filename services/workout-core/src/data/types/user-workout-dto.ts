@@ -8,7 +8,7 @@ export interface ExerciseDTO {
 
 export interface WorkoutDTO {
     workout_name: string;
-    exercises?: ExerciseDTO[] | null;
+    exercises: ExerciseDTO[];
 }
 
 export interface UserWorkoutDTO {

@@ -5,6 +5,9 @@ from repository import UserRepository, PostgresqlUserRepository
 from os import getenv
 from fastapi import Depends
 
+PRIVATE_KEY_PATH = getenv("PRIVATE_KEY_PATH")
+PUBLIC_KEY_PATH = getenv("PUBLIC_KEY_PATH")
+
 db_variables = {
     "POSTGRES_USER": getenv("POSTGRES_USER"),
     "POSTGRES_PASSWORD": getenv("POSTGRES_PASSWORD"),
@@ -33,4 +36,9 @@ def get_auth_manager(repository: UserRepository = Depends(get_user_repository)) 
     return AuthManager(repository)
 
 def get_jwt_util() -> JWTUtil:
-    return JWTUtil()
+    with open(PRIVATE_KEY_PATH, "rb") as f:
+        return JWTUtil(f.read(), "RS256")
+
+def get_public_key() -> str:
+    with open(PUBLIC_KEY_PATH, "rb") as f:
+        return f.read()

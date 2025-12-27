@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, status, Header, HTTPException
 from fastapi.responses import JSONResponse
 from api_models import UserSignUp, UserLogIn, UserDeleteAccount
-from dependencies import get_auth_manager, get_jwt_util
+from dependencies import get_auth_manager, get_jwt_util, get_public_key
 from auth_manager import AuthManager
 from jwt_utils import JWTUtil
 from grpc_client import create_user, delete_user
@@ -76,6 +76,7 @@ async def delete_account(
     authorization: str = Header(None),
     auth_manager: AuthManager = Depends(get_auth_manager),
     jwt_util: JWTUtil = Depends(get_jwt_util),
+    public_key: bytes = Depends(get_public_key)
 ):
 
     if not authorization or not authorization.startswith("Bearer "):
@@ -86,7 +87,7 @@ async def delete_account(
         )
 
     jwt_token = authorization.split(" ")[1]
-    token_data = jwt_util.verify_token(jwt_token)
+    token_data = jwt_util.verify_token(jwt_token, public_key)
     if not token_data:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

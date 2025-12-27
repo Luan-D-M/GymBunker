@@ -7,3 +7,12 @@ Running the Unit Tests:
     this README.md file is.
     
   ./run-tests.sh
+
+
+
+
+PS: Key pair for JWT generated with 
+```
+ssh-keygen -t rsa -b 4096 -m PEM -f ./keys/jwtRS256.key
+openssl rsa -in ./keys/jwtRS256.key -pubout -outform PEM -out ../../keys/jwtRS256.key.pub
+```
