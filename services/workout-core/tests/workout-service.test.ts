@@ -71,9 +71,10 @@ describe('getUserData', () => {
     expect(userData).toEqual(expectedData)
   });
 
-  test('returns null if the user is not found', async () => {
-    const userData = await getUserData(MOCK_USER_ID)
-    expect(userData).toBeNull()
+  test('returns error if the user is not found', async () => {
+    await expect(getUserData(MOCK_USER_ID))
+      .rejects
+      .toThrow(`User ${MOCK_USER_ID} not found`)
   });
 
   test('returns the complete nested workout structure for an existing user', async () => {
@@ -157,7 +158,7 @@ describe('addWorkout', () => {
 
     await expect(addWorkout(MOCK_USER_ID, newWorkout))
       .rejects
-      .toThrow(`User workout not found for user ${MOCK_USER_ID}`);
+      .toThrow(`User ${MOCK_USER_ID} not found`);
   });
 });
 

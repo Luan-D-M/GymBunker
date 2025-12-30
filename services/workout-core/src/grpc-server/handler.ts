@@ -13,6 +13,7 @@ import {
 
 import { createUser as createUserInDatabase ,
          deleteUser as deleteUserFromDatabase} from '../logic/workout-logic.js';
+import { HttpError } from '../utils/http-error.js';
 
 export const createUser = async (
     call: ServerUnaryCall<CreateUserRequest, CreateUserResponse>,
@@ -26,6 +27,10 @@ export const createUser = async (
         
         return callback(null, response);
     } catch (e: any) {
+        if (e instanceof HttpError && e.statusCode === 409) {
+            return callback({ code: status.ALREADY_EXISTS, details: e.message });
+        }
+
         return callback(
             {
                 code: status.INTERNAL,

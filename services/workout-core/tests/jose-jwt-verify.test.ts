@@ -1,9 +1,10 @@
 import { importSPKI, jwtVerify, importPKCS8, SignJWT } from "jose";
+import { JWSInvalid, JWSSignatureVerificationFailed, JWTExpired } from "jose/errors";
 
 
 const ALGORITHM = 'RS256'
 
-const createJWt = async () => {
+const createJWt = async (createExpiredJwt = false) => {
   const pkcs8 =  `-----BEGIN PRIVATE KEY-----
 MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQC5L5cxWZtwzqzr
 7UzE1ZvviFPKSfSyA22vo41mgDHL1DMjfiVw1eHFfg5IMnL05fENNCDGv+YQN3ST
@@ -58,8 +59,9 @@ MjEW0GZNM1rEA3OkNRnyz0ZcGTXqeg==
 -----END PRIVATE KEY-----`
   const privateKey = await importPKCS8(pkcs8, ALGORITHM)
 
+  const expirationTime = createExpiredJwt ? '-1min' : '1min';
   const jwt = await new SignJWT({ 'urn:example:claim': true })
-    .setExpirationTime('1min')
+    .setExpirationTime(expirationTime)
     .setProtectedHeader({
       alg: ALGORITHM,
       typ: 'JWT'
@@ -86,6 +88,23 @@ oURbnb8ZbUUx8d5/hx+krl0CAwEAAQ==
 -----END PUBLIC KEY-----`  
 }
 
+const getWrongPublicKey = () => {
+  return `-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAi6rqL4i0UOE/Xl0DZ5qm
+TaNC+Nxd+q6grVfyz77kOx0K3xtFbroqf8O4rpFwqaxI3sfa/g9C6RYIABmeRg1v
+r1hNWrdTerGVuIjrPqCQ1YdNxywyPH3kaXgh4o4NpC76KUmeLG7nD1pc1ia6WBDg
+c19XMqAZZwX8KCJcro5I1pfMpX3vE42jeBudWhFEym079P8HIVZom8sT+/5DJgP5
+iE/GK2ykuwgEsbUTYno90Y+lOAsomBSCo0R/lzBoV53yYAQyp4xA2K1V2p1r3Q5q
+D/qEtmNltl1YLobMMGMCEtR58ZqHjHrF13WTVNsx2pxmAxZeOCQwhxKPFN4O7v7W
+n7SsTA7MbIFLrqhudwacEKPLsc7jYwQhhzUj51hQqwRBhY0Kj6sHpR031hMsJwjS
+bOG/A3Yoi4W4hPkvmnlKT2HncUbfWcSy3unUmvePMmZcgMscLgXWZVBW/qlJWwEP
+LkHj2WsaIz0ZMt3mIrlZIS8xHSPYqcv4cqzrqAiCflG2ZFUtZbtU0a/NrNn80iGZ
+iycpvuAAypSjrGJkve6hSH+ZwfyM6Cxtx8O1HhmX8gU+GciT8GBxwmmuObsP3jg5
+OwzCG9ZFMDeQCFSjGhVzEGy043Ap/yfb8y1XtON9v/V9mSbw+70ZGdAG1x8SHSSe
+R0XSaOOjxbJtkwiN4m3p9UUCAwEAAQ==
+-----END PUBLIC KEY-----`
+}
+
 
 test('verifies JWT', async () => {
   const spki = getPublicKey();
@@ -98,4 +117,40 @@ test('verifies JWT', async () => {
 
   expect(payload['urn:example:claim']).toBe(true);
   expect(payload.exp).toBeDefined();
+});
+
+
+test('fails to verify signature when using the wrong public key', async () => {
+  const spki = getWrongPublicKey();
+  const publicKey = await importSPKI(spki, ALGORITHM);
+  
+  const jwt = await createJWt()
+
+  await expect(jwtVerify(jwt, publicKey, {algorithms: ["RS256"]}))
+    .rejects
+    .toThrow(JWSSignatureVerificationFailed)
+});
+
+
+test('throws JWTExpired when token is past expiration', async () => {
+        const spki = getPublicKey();
+        const publicKey = await importSPKI(spki, ALGORITHM);
+        
+        const jwt = await createJWt(/*createExpiredJwt:*/ true); 
+
+        await expect(jwtVerify(jwt, publicKey))
+            .rejects
+            .toThrow(JWTExpired);
+});
+
+
+test('throws JWSInvalid when token is malformed', async () => {
+        const spki = getPublicKey();
+        const publicKey = await importSPKI(spki, ALGORITHM);
+        
+        const malformedToken = "this.is.not.a.token";
+
+        await expect(jwtVerify(malformedToken, publicKey))
+            .rejects
+            .toThrow(JWSInvalid);
 });
