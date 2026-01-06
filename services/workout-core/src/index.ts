@@ -7,6 +7,7 @@ import { importSPKI } from 'jose/key/import';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { startGrpc } from './grpc-server/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,8 @@ const start = async () => {
     //  Open the connection pool
     await connectToDatabase(); // ToDo: at some point should be closed.
     
+    startGrpc()
+
     console.log('Reading private key...')
 
     // path.resolve(__dirname, '../../keys/jwtRS256.key.pub');

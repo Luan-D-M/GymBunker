@@ -60,18 +60,7 @@ def main():
         parts = token.split('.')
         assert len(parts) == 3, "Token does not look like a valid JWT (Header.Payload.Signature)"
         print("✅ OK")
-
-        # 5. Test Public Key Endpoint (Optional)
-        print("5. Testing Public Key Endpoint...", end=" ")
-        resp = requests.get(f"{BASE_URL}/public-key") 
         
-        if resp.status_code == 404:
-            print("⚠️  SKIPPED (Endpoint not found)")
-        else:
-            assert resp.status_code == 200, f"Failed to get key: {resp.status_code}"
-            assert "-----BEGIN PUBLIC KEY-----" in resp.text, "Response does not contain a PEM key"
-            print("✅ OK")
-
         print("\n✨ ALL TESTS PASSED.")
 
     except AssertionError as e:

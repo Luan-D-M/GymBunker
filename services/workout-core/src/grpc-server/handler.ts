@@ -9,7 +9,7 @@ import {
     CreateUserResponse,
     DeleteUserRequest,
     DeleteUserResponse
-} from '../proto/usermanagement/v1/user_management_pb.js';
+} from '../proto/usermanagement/v1/user_management.js';
 
 import { createUser as createUserInDatabase ,
          deleteUser as deleteUserFromDatabase} from '../logic/workout-logic.js';
@@ -20,10 +20,10 @@ export const createUser = async (
     callback: sendUnaryData<CreateUserResponse>
 ) => {
     try {
-        const userId: string = call.request.getId()
+        const userId: string = call.request.id
         await createUserInDatabase(userId)
         
-        const response = new CreateUserResponse();
+        const response: CreateUserResponse = {};
         
         return callback(null, response);
     } catch (e: any) {
@@ -48,10 +48,10 @@ export const deleteUser = async (
     callback: sendUnaryData<DeleteUserResponse>
 ) => {
     try {
-        const userId: string = call.request.getId()
+        const userId: string = call.request.id
         await deleteUserFromDatabase(userId)
         
-        const response = new DeleteUserResponse();
+        const response: DeleteUserResponse = {};
         
         return callback(null, response);
     } catch (e: any) {

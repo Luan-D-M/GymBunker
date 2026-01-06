@@ -10,7 +10,6 @@
     "skipLibCheck": true,                                 
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "allowJs": true                                       /* To compile the generated proto files */
   },
   
   "include": ["src/**/*", "tests/**/*"]
