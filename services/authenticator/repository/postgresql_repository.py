@@ -28,9 +28,11 @@ class PostgresqlUserRepository(UserRepository):
         A private context manager to establish and manage a database connection.
         """
 
+        # https://www.psycopg.org/psycopg3/docs/advanced/async.html
         # AsyncConnectionPool would have better performance
-        async with psycopg.AsyncConnection.connect(**self.__conn_details) as conn:
-            yield conn.cursor()
+        async with await psycopg.AsyncConnection.connect(**self.__conn_details, autocommit=True) as conn:
+            async with conn.cursor() as cur:
+              yield cur
         
 
     async def get(self, username: str) -> User | None:

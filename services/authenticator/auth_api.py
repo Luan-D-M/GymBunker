@@ -25,14 +25,15 @@ async def signup(
     )
     try:
         await create_user(user.username)
-    except Exception:
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         # Clean up the local DB so the user can try again later
         await auth_manager.delete_user(user.username)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail='Service is unavailable'
+            detail=f"Service unavailable: {e}" # <--- Add {e} temporarily to the response
         )
-
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content={
