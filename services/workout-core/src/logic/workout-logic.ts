@@ -1,6 +1,6 @@
 import { UserWorkoutsModel } from '../data/models/user-workouts-model.js'
 import { Workout } from '../data/schemas/workout-schema.js'
-import { UserWorkoutDTO } from '../data/types/user-workout-dto.js';
+import { UserWorkoutDTO, WorkoutDTO } from '../data/types/user-workout-dto.js';
 import { HttpError } from '../utils/http-error.js';
 
 // Editing Workouts and Exercises is done in the front end.
@@ -19,7 +19,7 @@ export const getUserData = async (user_id: string) : Promise<UserWorkoutDTO>  =>
 }
 
 
-export const addWorkout = async (user_id: string, workout: Workout)  => {
+export const addWorkout = async (user_id: string, workout: WorkoutDTO)  => {
     const userWorkouts = await UserWorkoutsModel.findOne({ user_id })
     if (!userWorkouts) {
         throw new HttpError(`User ${user_id} not found`, 404)
@@ -32,7 +32,7 @@ export const addWorkout = async (user_id: string, workout: Workout)  => {
 export const updateWorkout = async (
     user_id: string,
     workout_name: string,
-    new_workout: Workout
+    new_workout: WorkoutDTO
 )  => {
     const userWorkouts = await UserWorkoutsModel.findOne({ user_id })
     if (!userWorkouts) {

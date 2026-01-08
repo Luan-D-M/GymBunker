@@ -3,6 +3,7 @@ import { Router, Request, Response } from 'express';
 import { Workout } from '../data/schemas/workout-schema.js'
 import { getUserData, addWorkout, updateWorkout, deleteWorkout } from '../logic/workout-logic.js';
 import { HttpError } from '../utils/http-error.js';
+import { WorkoutZodSchema } from '../data/schemas/workout-zod-schema.js';
 
 // ToDo: API testing.
 /*
@@ -24,7 +25,8 @@ router.post('/add-workout', async (req: Request, res: Response) => {
     const userId = res.locals.username;
     const workoutData: Workout = req.body.workout;
 
-    const updatedUser = await addWorkout(userId, workoutData);
+    const validData = WorkoutZodSchema.parse(workoutData);
+    const updatedUser = await addWorkout(userId, validData);
     if (!updatedUser) {
         throw new HttpError("User not found", 404);
     }
@@ -35,9 +37,10 @@ router.post('/add-workout', async (req: Request, res: Response) => {
 router.post('/update-workout/:workoutName', async (req: Request, res: Response) => {
     const userId = res.locals.username;
     const { workoutName } = req.params;
-    const updateData: Workout = req.body.workout
+    const updatedData: Workout = req.body.workout
 
-    const result = await updateWorkout(userId, workoutName, updateData);
+    const validData = WorkoutZodSchema.parse(updatedData);
+    const result = await updateWorkout(userId, workoutName, validData);
 
     return res.status(200).json(result);
 });
