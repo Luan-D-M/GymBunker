@@ -27,6 +27,7 @@ export const createUser = async (
         
         return callback(null, response);
     } catch (e: any) {
+        console.error("❌ CRITICAL gRPC ERROR:", e);
         if (e instanceof HttpError && e.statusCode === 409) {
             return callback({ code: status.ALREADY_EXISTS, details: e.message });
         }

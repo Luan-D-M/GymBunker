@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  title: GymBunker Workout Core
+  version: 1.0.0
+  description: API for managing user workouts, exercises, and history.
+
+servers:
+  - url: http://localhost:3000/user
+    description: Local Development
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Exercise:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Bench Press"
+        weight:
+          type: number
+          nullable: true
+          example: 80
+        number_reps:
+          type: integer
+          nullable: true
+          example: 10
+        number_sets:
+          type: integer
+          nullable: true
+          example: 4
+        rest_time_in_seconds:
+          type: integer
+          nullable: true
+          example: 60
+
+    Workout:
+      type: object
+      required: [workout_name, exercises]
+      properties:
+        workout_name:
+          type: string
+          example: "Push Day"
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/Exercise'
+
+    UserWorkoutProfile:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: "user_123"
+        workouts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Workout'
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Error message details"
+
+paths:
+  # --- GET USER DATA ---
+  /:
+    get:
+      summary: Get User Profile & Workouts
+      tags: [User]
+      responses:
+        200:
+          description: Returns full user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWorkoutProfile'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # --- ADD WORKOUT ---
+  /add-workout:
+    post:
+      summary: Add a new workout
+      tags: [Workouts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workout'
+      responses:
+        201:
+          description: Workout created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWorkoutProfile'
+        400:
+          description: Validation Error (Invalid data)
+        404:
+          description: User not found
+
+  # --- UPDATE WORKOUT ---
+  /update-workout/{workoutName}:
+    post:
+      summary: Update an existing workout
+      tags: [Workouts]
+      parameters:
+        - in: path
+          name: workoutName
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workout'
+      responses:
+        200:
+          description: Workout updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWorkoutProfile'
+        400:
+          description: Validation Error
+
+  # --- DELETE WORKOUT ---
+  /delete-workout/{workoutName}:
+    delete:
+      summary: Delete a workout
+      tags: [Workouts]
+      parameters:
+        - in: path
+          name: workoutName
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Workout deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Workout deleted successfully"
+                  data:
+                    $ref: '#/components/schemas/UserWorkoutProfile'

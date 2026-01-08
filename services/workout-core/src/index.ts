@@ -1,19 +1,22 @@
 import express from 'express';
-import router  from './routes/public-api.js'
-import { connectToDatabase } from './mongo-client.js';
-import { jwtAuthenticatorFabric } from './middlewares/jwt-authenticator.js';
-import { errorHandler } from './middlewares/errorHandler.js';
+import path from 'path';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 import { importSPKI } from 'jose/key/import';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import path from 'path';
+
+import router  from './routes/public-api.js'
 import { startGrpc } from './grpc-server/index.js';
+import { connectToDatabase } from './mongo-client.js';
+import { jwtAuthenticatorFabric } from './middlewares/jwt-authenticator.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Relative to 'npm start' with cwd ./authenticator
-// ToDO: put this in an .env file  --> It probably won't work right now.
+const swaggerDocument = YAML.load(path.join(__dirname, './docs/openapi.yaml'));
+
 const app = express();
 const port = 3000; // ToDo: configute it with .env file
 
@@ -35,6 +38,7 @@ const start = async () => {
     const keyString: string = await readFile(PRIVATE_KEY_PATH, 'utf-8');
     const publicKey = await importSPKI(keyString, 'RS256');
 
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     app.use(express.json()); // Middleware to parse JSON bodies
 
     app.use(jwtAuthenticatorFabric(publicKey));

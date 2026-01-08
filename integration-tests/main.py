@@ -151,7 +151,7 @@ def main():
 
         # Test Delete Workout
         print("8. Testing Delete Workout...", end=" ")
-        resp = requests.patch(f"{WORKOUT_URL}/delete-workout/{workout_name}", headers=headers)
+        resp = requests.delete(f"{WORKOUT_URL}/delete-workout/{workout_name}", headers=headers)
         assert resp.status_code == 200, f"Delete Workout failed: {resp.status_code} - {resp.text}"
         
         # Verify deletion

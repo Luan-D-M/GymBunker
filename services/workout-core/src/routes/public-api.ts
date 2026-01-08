@@ -49,7 +49,7 @@ router.post('/update-workout/:workoutName', async (req: Request, res: Response) 
     return res.status(200).json(result);
 });
 
-router.patch('/delete-workout/:workoutName', async (req: Request, res: Response) => {
+router.delete('/delete-workout/:workoutName', async (req: Request, res: Response) => {
     const userId = res.locals.username;
     const { workoutName } = req.params;
 

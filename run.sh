@@ -16,7 +16,7 @@ cleanup() {
         kill $CORE_PID
     fi
 
-    docker compose stop -v
+    docker compose down -v
 
     echo "✅ Done."
     exit

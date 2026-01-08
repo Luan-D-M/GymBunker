@@ -2,7 +2,7 @@
  import { Schema, InferSchemaType } from 'mongoose';
  
  export const WorkoutSchema = new Schema({
-    workout_name: { type: String, required: true, unique: true },
+    workout_name: { type: String, required: true },
     exercises: {
       type: [ExerciseSchema],
       required: true,

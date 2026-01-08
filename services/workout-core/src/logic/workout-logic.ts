@@ -25,6 +25,13 @@ export const addWorkout = async (user_id: string, workout: WorkoutDTO)  => {
         throw new HttpError(`User ${user_id} not found`, 404)
     }
 
+    const isDuplicate = userWorkouts.workouts.some(
+        (w) => w.workout_name.toLowerCase() === workout.workout_name.toLowerCase()
+    );
+    if (isDuplicate) {
+        throw new HttpError(`Workout '${workout.workout_name}' already exists.`, 409)
+    }
+
     userWorkouts.workouts.push(workout)
     return userWorkouts.save()
 };
