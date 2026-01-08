@@ -6,7 +6,7 @@ def main():
     AUTH_URL = "http://localhost:5000"
     WORKOUT_URL = "http://localhost:3000/user"
     
-    USERNAME = "testuser"
+    USERNAME = "username123"
     PASSWORD = "password123"
 
     print(f"🚀 Starting integration tests...")

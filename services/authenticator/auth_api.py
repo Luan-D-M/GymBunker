@@ -49,9 +49,11 @@ async def login(
     auth_manager: AuthManager = Depends(get_auth_manager),
     jwt_util: JWTUtil = Depends(get_jwt_util),
 ):
+
     is_authenticated = await auth_manager.verify_password_and_update_its_hash_in_database_if_needed(
         user.username, user.password
     )
+
     if not is_authenticated:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

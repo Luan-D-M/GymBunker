@@ -14,6 +14,10 @@ import { WorkoutZodSchema } from '../data/schemas/workout-zod-schema.js';
 
 const router = Router();
 
+/*
+* User validation is done by the authenticator service.
+* Here it isnt needed because the jwt is verified before any of this endpoints runs.
+*/
 router.get('/', async (req: Request, res: Response) => {
     const userId = res.locals.username;
     const userData = await getUserData(userId);
