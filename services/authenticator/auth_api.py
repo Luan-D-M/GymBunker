@@ -5,10 +5,16 @@ from dependencies import get_auth_manager, get_jwt_util, get_public_key
 from auth_manager import AuthManager
 from jwt_utils import JWTUtil
 from grpc_client import create_user, delete_user
+from docs_config import SIGNUP_DOC, LOGIN_DOC, DELETE_ACCOUNT_DOC
 
-app = FastAPI()
 
-@app.post('/signup')
+app = FastAPI(
+    title="GymBunker Auth Service",
+    description="Microservice for handling User Sign-up, Login (JWT), and Account Management.",
+    version="1.0.0"
+)
+
+@app.post('/signup', **SIGNUP_DOC)
 async def signup(
     user: UserSignUp,
     auth_manager: AuthManager = Depends(get_auth_manager),
@@ -43,7 +49,7 @@ async def signup(
     )
 
 
-@app.post('/login')
+@app.post('/login', **LOGIN_DOC)
 async def login(
     user: UserLogIn,
     auth_manager: AuthManager = Depends(get_auth_manager),
@@ -73,7 +79,7 @@ async def login(
     )
 
 
-@app.post('/delete-account')
+@app.post('/delete-account', **DELETE_ACCOUNT_DOC)
 async def delete_account(
     user: UserDeleteAccount,
     authorization: str = Header(None),

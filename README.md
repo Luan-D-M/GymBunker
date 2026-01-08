@@ -9,13 +9,14 @@ source .env
 docker compose up  
 
 
+# Documentation
+## Authenticator service 
+http://localhost:5000/docs
+
 
 
 # Note 
 If someday this project goes to production, a new keypair must be created.
 Both public and private keys were added to the repository as an exemple.
 
-
-ToDo:
-	- Integration Tests --> to test postgresql and api.
-				(Will probably be a .sh demo or something)    
+ 
