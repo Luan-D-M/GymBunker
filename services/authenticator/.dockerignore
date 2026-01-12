@@ -1,0 +1,21 @@
+# --- Virtual Environments (Crucial) ---
+venv
+env
+
+# --- Python Cache ---
+__pycache__
+*.pyc
+
+# --- Secrets & Keys (Security Warning) ---
+keys
+.env
+.env_example
+
+# --- Git & Metadata ---
+.git
+.gitignore
+README.md
+
+# --- Unused ---
+postgres
+Dockerfile

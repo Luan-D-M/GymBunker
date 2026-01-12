@@ -1,6 +1,7 @@
 pyjwt[crypto]
 argon2-cffi
 fastapi
+uvicorn[standard]
 httpx
 psycopg[binary]
 betterproto[compiler] # https://github.com/danielgtaylor/python-betterproto

@@ -4,13 +4,12 @@ from repository import UserRepository, PostgresqlUserRepository
 
 from os import getenv
 from fastapi import Depends
-from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # Root folder of the project
+GRPC_HOST = getenv("GRPC_HOST")
+GRPC_PORT = getenv("GRPC_PORT")
 
 PRIVATE_KEY_PATH = getenv("PRIVATE_KEY_PATH")
-PUBLIC_KEY_PATH = getenv("PUBLIC_KEY_PATH").lstrip("./")
-PUBLIC_KEY_PATH = PROJECT_ROOT / PUBLIC_KEY_PATH
+PUBLIC_KEY_PATH = getenv("PUBLIC_KEY_PATH")
 
 db_variables = {
     "POSTGRES_USER": getenv("POSTGRES_USER"),

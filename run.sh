@@ -6,10 +6,10 @@
 cleanup() {
     echo -e "\n🛑 Stopping services..."
     
-    if [ -n "$AUTH_PID" ]; then
-        echo "Killing Authenticator (PID $AUTH_PID)..."
-        kill $AUTH_PID
-    fi
+    #if [ -n "$AUTH_PID" ]; then
+    #    echo "Killing Authenticator (PID $AUTH_PID)..."
+    #    kill $AUTH_PID
+    #fi
 
     if [ -n "$CORE_PID" ]; then
         echo "Killing Workout Core (PID $CORE_PID)..."
@@ -34,10 +34,10 @@ set +a
 echo " Starting Docker dependencies..."
 docker compose up -d
 
-echo "Starting Authenticator..."
+#echo "Starting Authenticator..."
 cd ./services/authenticator
-python3 main.py & 
-AUTH_PID=$! # Capture the PID of the last command
+#python3 main.py & 
+#AUTH_PID=$! # Capture the PID of the last command
 cd ..
 
 echo "Starting Workout Core..."
@@ -51,4 +51,4 @@ cd ..
 echo "All services running. Press Ctrl+C to stop."
 
 # Wait prevents the script from exiting immediately
-wait $AUTH_PID $CORE_PID
+wait $CORE_PID #$AUTH_PID
