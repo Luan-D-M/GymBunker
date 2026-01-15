@@ -1,0 +1,22 @@
+# --- Dependencies (Crucial) ---
+node_modules
+npm-debug.log
+
+# --- Build Artifacts ---
+dist
+coverage
+
+# --- Docker & Git ---
+Dockerfile
+.dockerignore
+.git
+.gitignore
+
+# --- Secrets ---
+.env
+.env_example
+
+
+# --- Documentation & Misc ---
+README.md
+tests

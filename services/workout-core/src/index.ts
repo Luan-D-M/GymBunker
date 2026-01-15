@@ -2,9 +2,11 @@ import express from 'express';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
-import { importSPKI } from 'jose/key/import';
+import { env } from 'node:process';
+
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
+import { importSPKI } from 'jose/key/import';
 
 import router  from './routes/public-api.js'
 import { startGrpc } from './grpc-server/index.js';
@@ -27,15 +29,14 @@ const start = async () => {
     
     startGrpc()
 
-    console.log('Reading private key...')
+    console.log('Reading public key...')
 
-    // path.resolve(__dirname, '../../keys/jwtRS256.key.pub');
-    const PRIVATE_KEY_PATH = path.resolve(
-      __dirname,
-      '../../../../keys/jwtRS256.key.pub'
-    );
+    const PUBLIC_KEY_PATH = env.PUBLIC_KEY_PATH;
+    if (!PUBLIC_KEY_PATH) {
+      throw new Error('PUBLIC_KEY_PATH is not set');
+    }
  
-    const keyString: string = await readFile(PRIVATE_KEY_PATH, 'utf-8');
+    const keyString: string = await readFile(PUBLIC_KEY_PATH, 'utf-8');
     const publicKey = await importSPKI(keyString, 'RS256');
 
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

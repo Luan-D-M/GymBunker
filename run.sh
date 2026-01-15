@@ -25,10 +25,10 @@ cleanup() {
 # Catch the "Ctrl+C" signal (SIGINT) and run cleanup
 trap cleanup SIGINT
 
-cp .env.example .env
-set -a
-source .env
-set +a
+#cp .env.example .env
+#set -a
+#source .env
+#set +a
 
 
 echo " Starting Docker dependencies..."
@@ -42,13 +42,13 @@ cd ..
 
 echo "Starting Workout Core..."
 cd ./workout-core
-npm run build
-npm start &
+#npm run build
+#npm start &
 
-CORE_PID=$! # Capture the PID
+#CORE_PID=$! # Capture the PID
 cd ..
 
 echo "All services running. Press Ctrl+C to stop."
 
 # Wait prevents the script from exiting immediately
-wait $CORE_PID #$AUTH_PID
+wait #$AUTH_PID

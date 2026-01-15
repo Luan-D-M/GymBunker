@@ -4,7 +4,7 @@ services:
       context: ./services/authenticator
       dockerfile: Dockerfile
     ports:
-      - 5000:5000
+      - "5000:5000"
     env_file:
       - ./services/authenticator/.env
     environment:
@@ -15,8 +15,27 @@ services:
     depends_on:
       authenticator-db:
         condition: service_healthy
+      workout-core:
+        condition: service_started
+
     extra_hosts:
         - "host.docker.internal:host-gateway"
+  #ToDo
+  workout-core:
+    build:
+      context: ./services/workout-core
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    env_file:
+      - ./services/workout-core/.env
+    secrets:
+      - auth_public_key
+    depends_on:
+      workout-core-db:
+        condition: service_healthy 
+  
   authenticator-db:
     restart: always
     build:
@@ -25,7 +44,7 @@ services:
     env_file:
       - ./services/authenticator/.env
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes: 
       - postgres_data:/var/lib/postgresql/data 
     healthcheck:
@@ -34,17 +53,24 @@ services:
       timeout: 5s
       retries: 5
   
-  gym-core-db:
+  workout-core-db:
     image: mongo:7.0
     container_name: local-mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
+    env_file:
+      - ./services/workout-core/.env
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
