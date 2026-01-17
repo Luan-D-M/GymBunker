@@ -11,10 +11,10 @@ docker compose up
 
 # Documentation
 ## Authenticator service 
-http://localhost:5000/docs
+http://localhost/auth/docs
 
 ## Workout-Core service
-http://localhost:3000/docs
+http://localhost/user/docs
 
 
 # Note 

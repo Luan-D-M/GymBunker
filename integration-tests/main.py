@@ -3,8 +3,8 @@ import sys
 
 def main():
     # --- Configuration ---
-    AUTH_URL = "http://localhost:5000"
-    WORKOUT_URL = "http://localhost:3000/user"
+    AUTH_URL = "http://localhost/auth"
+    WORKOUT_URL = "http://localhost/user"
     
     USERNAME = "username123"
     PASSWORD = "password123"
@@ -227,7 +227,7 @@ def main():
             "password": PASSWORD
         }
         
-        resp = requests.post(f"{AUTH_URL}/delete-account", json=delete_payload, headers=headers)
+        resp = requests.delete(f"{AUTH_URL}/delete-account", json=delete_payload, headers=headers)
         assert resp.status_code == 200, f"Delete Account failed: {resp.status_code} - {resp.text}"
         print("✅ OK")
 

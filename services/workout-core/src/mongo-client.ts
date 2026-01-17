@@ -6,9 +6,6 @@ export const connectToDatabase = async () => {
   const mongoUri = `mongodb://${dbConfig.user}:${dbConfig.password}@${dbConfig.host}:${dbConfig.port}/${dbConfig.dbName}?authSource=${dbConfig.authSource}`;
 
   try {
-    // Log the connection attempt (masking the password for security)
-    console.log(`🔌 Connecting to: mongodb://${dbConfig.user}:*****@${dbConfig.host}:${dbConfig.port}/${dbConfig.dbName}`);
-
     await connect(mongoUri);
     console.log("✅ Database connected (Pool Ready)");
   } catch (err) {

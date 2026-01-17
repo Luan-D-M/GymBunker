@@ -1,4 +1,16 @@
 services:
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - backend-network
+    depends_on:
+      - authenticator
+      - workout-core
+
   authenticator:
     build:
       context: ./services/authenticator
@@ -9,9 +21,12 @@ services:
       - ./services/authenticator/.env
     environment:
       - POSTGRES_HOST=authenticator-db 
+      - ROOT_PATH=/auth
     secrets:
       - auth_private_key
       - auth_public_key
+    networks:
+      - backend-network
     depends_on:
       authenticator-db:
         condition: service_healthy
@@ -20,18 +35,20 @@ services:
 
     extra_hosts:
         - "host.docker.internal:host-gateway"
-  #ToDo
+
   workout-core:
     build:
       context: ./services/workout-core
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-      - "4000:4000"
+      - "3000:3000"  # API
+      - "4000:4000"  # GRPC
     env_file:
       - ./services/workout-core/.env
     secrets:
       - auth_public_key
+    networks:
+      - backend-network
     depends_on:
       workout-core-db:
         condition: service_healthy 
@@ -46,7 +63,9 @@ services:
     ports:
       - "5432:5432"
     volumes: 
-      - postgres_data:/var/lib/postgresql/data 
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -66,6 +85,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - mongo_data:/data/db
+    networks:
+      - backend-network
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s
@@ -81,3 +102,7 @@ secrets:
     file: ./services/authenticator/keys/jwtRS256.key
   auth_public_key:
     file: ./keys/jwtRS256.key.pub
+
+networks:
+  backend-network:
+    driver: bridge

@@ -39,7 +39,7 @@ const start = async () => {
     const keyString: string = await readFile(PUBLIC_KEY_PATH, 'utf-8');
     const publicKey = await importSPKI(keyString, 'RS256');
 
-    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.use('/user/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     app.use(express.json()); // Middleware to parse JSON bodies
 
     app.use(jwtAuthenticatorFabric(publicKey));

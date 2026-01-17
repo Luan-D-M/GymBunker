@@ -1,3 +1,4 @@
+from os import getenv
 from fastapi import FastAPI, Depends, status, Header, HTTPException
 from fastapi.responses import JSONResponse
 from api_models import UserSignUp, UserLogIn, UserDeleteAccount
@@ -9,6 +10,7 @@ from docs_config import SIGNUP_DOC, LOGIN_DOC, DELETE_ACCOUNT_DOC
 
 
 app = FastAPI(
+    root_path=getenv("ROOT_PATH", ""),
     title="GymBunker Auth Service",
     description="Microservice for handling User Sign-up, Login (JWT), and Account Management.",
     version="1.0.0"
@@ -72,14 +74,14 @@ async def login(
         status_code=status.HTTP_200_OK,
         content={
             "username": user.username,
-            "message": "User created successfully",
+            "message": "Login successful",
             "access_token": jwt_token,
             "tokentype": "bearer"
         }
     )
 
 
-@app.post('/delete-account', **DELETE_ACCOUNT_DOC)
+@app.delete('/delete-account', **DELETE_ACCOUNT_DOC)
 async def delete_account(
     user: UserDeleteAccount,
     authorization: str = Header(None),
