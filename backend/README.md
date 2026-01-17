@@ -1,10 +1,6 @@
 # GymBunker
 
 Running:
-
-
-cp ./services/authenticator/.env.example ./services/authenticator/.env
-
 (Docker version >= 24.0.0)
 docker compose up  
 
