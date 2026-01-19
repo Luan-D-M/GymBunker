@@ -31,9 +31,6 @@ router.post('/add-workout', async (req: Request, res: Response) => {
 
     const validData = WorkoutZodSchema.parse(workoutData);
     const updatedUser = await addWorkout(userId, validData);
-    if (!updatedUser) {
-        throw new HttpError("User not found", 404);
-    }
 
     return res.status(201).json(updatedUser);
 });

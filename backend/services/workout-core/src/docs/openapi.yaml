@@ -115,6 +115,8 @@ paths:
           description: Validation Error (Invalid data)
         404:
           description: User not found
+        409:
+          description: Workout name already exists
 
   # --- UPDATE WORKOUT ---
   /update-workout/{workoutName}:
@@ -142,6 +144,8 @@ paths:
                 $ref: '#/components/schemas/UserWorkoutProfile'
         400:
           description: Validation Error
+        404:
+          description: User or workout wasn't found.
 
   # --- DELETE WORKOUT ---
   /delete-workout/{workoutName}:

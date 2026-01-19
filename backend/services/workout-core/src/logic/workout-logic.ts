@@ -18,22 +18,31 @@ export const getUserData = async (user_id: string) : Promise<UserWorkoutDTO>  =>
     return result;
 }
 
-
 export const addWorkout = async (user_id: string, workout: WorkoutDTO)  => {
-    const userWorkouts = await UserWorkoutsModel.findOne({ user_id })
-    if (!userWorkouts) {
-        throw new HttpError(`User ${user_id} not found`, 404)
-    }
+    const clean_workout_name = workout.workout_name.trim()
+    workout.workout_name = clean_workout_name
 
-    const isDuplicate = userWorkouts.workouts.some(
-        (w) => w.workout_name.toLowerCase() === workout.workout_name.toLowerCase()
+    const result = await UserWorkoutsModel.updateOne(
+        { 
+            user_id, 
+            "workouts.workout_name": { $ne: clean_workout_name } 
+        },
+        { 
+            $push: { workouts: workout } 
+        }
     );
-    if (isDuplicate) {
-        throw new HttpError(`Workout '${workout.workout_name}' already exists.`, 409)
+
+    if (result.modifiedCount === 0) {
+        // If update failed, check if it was 404 (User missing) or 409 (Duplicate)
+        const userExists = await UserWorkoutsModel.exists({ user_id });
+        if (!userExists) {
+            throw new HttpError(`User ${user_id} not found`, 404);
+        } else {
+            throw new HttpError(`Workout name '${clean_workout_name}' already exists.`, 409);
+        }
     }
 
-    userWorkouts.workouts.push(workout)
-    return userWorkouts.save()
+    return getUserData(user_id);
 };
 
 export const updateWorkout = async (
@@ -41,24 +50,36 @@ export const updateWorkout = async (
     workout_name: string,
     new_workout: WorkoutDTO
 )  => {
-    const userWorkouts = await UserWorkoutsModel.findOne({ user_id })
-    if (!userWorkouts) {
-        throw new HttpError(`User ${user_id} not found`, 404)
+    const clean_workout_name = workout_name.trim()
+
+    const result = await UserWorkoutsModel.findOneAndUpdate(
+        // Query
+        { user_id,  
+          "workouts.workout_name" : clean_workout_name
+        },
+        // Update
+        {
+            $set: { "workouts.$": new_workout }
+        },
+        // Options
+        {
+            new: true,
+        }
+    ) 
+
+    if (!result) {
+        // If null, it means either the User didn't exist OR the Workout didn't exist
+        throw new HttpError(`User ${user_id} or Workout '${clean_workout_name}' not found`, 404);
     }
 
-    const workout = userWorkouts.workouts.find(w => w.workout_name === workout_name);
-    if (!workout) {
-        throw new HttpError(`Workout '${workout_name}' not found`, 404);
-    }
-    
-    workout.set(new_workout);
-    return userWorkouts.save();
+    return result;
 }
 
 export const deleteWorkout = async (user_id: string, workout_name: string) => {
+    const clean_workout_name = workout_name.trim()
     const result = await UserWorkoutsModel.findOneAndUpdate(
         { user_id },
-        { $pull: { workouts: { workout_name } } },
+        { $pull: { workouts: { workout_name: clean_workout_name } } },
         { new: true }
     );
     
@@ -71,15 +92,18 @@ export const deleteWorkout = async (user_id: string, workout_name: string) => {
 
 // Used by gRPC
 export const createUser = async (user_id: string) : Promise<void> => {
-   const result = await UserWorkoutsModel.findOne({ user_id })
-    if (result) {
-        throw new HttpError(`User ${user_id} already exists`, 409)
+    try{
+        //create () instantiates and saves the document
+        await UserWorkoutsModel.create(   
+            {user_id,
+            workouts: []}
+        ) 
+    } catch (error: any) {  // https://www.mongodb.com/docs/manual/reference/error-codes/
+        if (error.code === 11000) { // code for DuplicateKey
+           throw new HttpError(`User ${user_id} already exists`, 409);
+       }
+       throw error
     }
-    //create () instantiates and saves the document
-    await UserWorkoutsModel.create(   
-        {user_id,
-        workouts: []}
-    ) 
 }
 
 // Used by gRPC
