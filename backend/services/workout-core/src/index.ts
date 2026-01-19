@@ -9,8 +9,8 @@ import { fileURLToPath } from 'url';
 import { importSPKI } from 'jose/key/import';
 
 import router  from './routes/public-api.js'
-import { startGrpc } from './grpc-server/index.js';
-import { connectToDatabase } from './mongo-client.js';
+import { startGrpc, stopGrpc } from './grpc-server/index.js';
+import { connectToDatabase, closeDatabase } from './mongo-client.js';
 import { jwtAuthenticatorFabric } from './middlewares/jwt-authenticator.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -24,13 +24,11 @@ const port = 3000; // ToDo: configute it with .env file
 
 const start = async () => {
   try {
-    //  Open the connection pool
-    await connectToDatabase(); // ToDo: at some point should be closed.
-    
+
+    await connectToDatabase(); 
     startGrpc()
 
     console.log('Reading public key...')
-
     const PUBLIC_KEY_PATH = env.PUBLIC_KEY_PATH;
     if (!PUBLIC_KEY_PATH) {
       throw new Error('PUBLIC_KEY_PATH is not set');
@@ -47,10 +45,43 @@ const start = async () => {
     app.use('/user', router); 
     app.use(errorHandler);
 
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
+    const httpServer = app.listen(
+      port,
+      () => {
+        console.log(`Server running on port ${port}`);
+      }
+    );
   
+
+    // --- GRACEFUL SHUTDOWN LOGIC ---
+    const gracefulShutdown = async (signal: string) => {
+        console.log(`\n${signal} signal received: closing HTTP server`);
+        
+        // 1. Stop accepting NEW Http requests
+        httpServer.close(async () => {
+            console.log('HTTP server closed');
+            
+            try {
+                // 2. Stop gRPC Server
+                console.log('Stopping gRPC server...');
+                await stopGrpc(); 
+
+                // 3. Close Database Connections (Do this LAST)
+                console.log('Closing database connection...');
+                await closeDatabase();
+
+                console.log('✅ Graceful shutdown completed');
+                process.exit(0);
+            } catch (err) {
+                console.error('Error during shutdown:', err);
+                process.exit(1);
+            }
+        });
+    };
+
+    // Listen for termination signals
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
   } catch (err) { 
     console.error("❌ CRITICAL STARTUP ERROR:", err);
     process.exit(1);
