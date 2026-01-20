@@ -81,7 +81,7 @@ async def login(
     )
 
 
-@app.delete('/delete-account', **DELETE_ACCOUNT_DOC)
+@app.post('/delete-account', **DELETE_ACCOUNT_DOC)
 async def delete_account(
     user: UserDeleteAccount,
     authorization: str = Header(None),

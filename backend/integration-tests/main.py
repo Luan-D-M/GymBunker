@@ -227,7 +227,7 @@ def main():
             "password": PASSWORD
         }
         
-        resp = requests.delete(f"{AUTH_URL}/delete-account", json=delete_payload, headers=headers)
+        resp = requests.post(f"{AUTH_URL}/delete-account", json=delete_payload, headers=headers)
         assert resp.status_code == 200, f"Delete Account failed: {resp.status_code} - {resp.text}"
         print("✅ OK")
 

@@ -13,6 +13,6 @@ RUN npm run build
 EXPOSE 3000
 EXPOSE 4000 
 
-#ENTRYPOINT ["npm", "start"]
+#CMD ["npm", "start"]
 # Mimics npm start to bypass signal propagation issues with npm
-ENTRYPOINT ["node", "dist/src/index.js"]  
+CMD ["node", "dist/src/index.js"]  
