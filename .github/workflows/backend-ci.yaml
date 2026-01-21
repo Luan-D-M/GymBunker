@@ -1,0 +1,52 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Run Tests in Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Create .env files
+        run: | 
+          cp ./backend/services/workout-core/.env.example \
+             ./backend/services/workout-core/.env
+
+          cp ./backend/services/authenticator/.env.example \
+             ./backend/services/authenticator/.env
+        
+      - name: Build Images
+        run: docker compose build
+
+      - name: Run Authenticator unit tests
+        run: docker compose run --rm authenticator ./run-tests.sh
+
+      - name: Run Workout-core unit tests 
+        run: docker compose run --rm workout-core npm test
+
+      # Integration test
+      - name: Start entire backend 
+        run: docker compose up -d --wait
+      
+      - name: Setup Python for Integration
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: pip install -r ./backend/integration-tests/requirements.txt
+
+      - name: Run Integration Test
+        run: python3 ./backend/integration-tests/integration-test.py
+
+      # Dump logs if it fails (For debugging)
+      - name: Dump Docker Logs
+        if: failure()
+        run: docker compose logs
+      

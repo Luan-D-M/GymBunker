@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 
-# Usage: Executed INSIDE the container to run tests.
-# 1. Install Test Dependencies
-# We install globally inside the container (no venv needed)
+# Usage: Executed INSIDE the container to run tests. (no venv needed)
+# Install Test Dependencies
 if [ -f "tests/requirements.txt" ]; then
     echo "[INFO] Installing test dependencies..."
     pip install --no-cache-dir -r tests/requirements.txt
