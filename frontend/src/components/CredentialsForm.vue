@@ -7,6 +7,8 @@ const props = defineProps<{
   formType: AuthForm
 }>();
 
+const emit = defineEmits(['signup-success', 'login-success'])
+
 const username = ref("");
 const password = ref("");
 const passwordConfirmed = ref("");
@@ -28,7 +30,9 @@ function formSubmitted() {
         // Clean warning messages
         warningMessage.value = "";
     } else { // formType === 'login'
-
+        // Todo: request and handle response
+        const jwt = "jwt-placeholder"
+        emit('login-success', username.value, jwt)  // sends username and jwt too
     }
 
 }

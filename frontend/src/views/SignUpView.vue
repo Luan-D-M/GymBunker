@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-
 import CredentialsForm from '../components/CredentialsForm.vue';
 
 
@@ -8,8 +6,8 @@ import CredentialsForm from '../components/CredentialsForm.vue';
 
 
 <template>
-  <h1>Log In</h1>
+  <h1>Sign Up</h1> 
 
-  <CredentialsForm :formType="'login'" />
+  <CredentialsForm :formType="'signup'" />
 
 </template>

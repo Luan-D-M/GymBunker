@@ -18,13 +18,24 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LogIn.vue')
+      component: () => import('../views/LogInView.vue')
     },
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('../views/SignUp.vue')
+      component: () => import('../views/SignUpView.vue')
+    },
+    {
+      path: '/add-workout',
+      name: 'add-workout',
+      component: () => import('../views/AddWorkoutView.vue')
+    },
+    {
+      path: '/update-workout',
+      name: 'update-workout',
+      component: () => import('../views/UpdateWorkoutView.vue')
     }
+
   ]
 })
 
