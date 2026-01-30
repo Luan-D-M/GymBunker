@@ -57,8 +57,8 @@ function logOut() {
       </span>
     </nav>
   </header>
-
-  <RouterView @login-success="onLoginSuccess" />
+  <!-- The :key bellow forces the page to reload when user log out. -->
+  <RouterView :key="$route.fullPath + String(isUserLogged)" @login-success="onLoginSuccess" />
 </template>
 
 <style>

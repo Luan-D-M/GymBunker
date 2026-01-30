@@ -5,7 +5,7 @@ import axios, { type AxiosResponse } from 'axios';
 
 import type { AuthForm } from '../types';
 import { BACKEND_URL } from '../config';
-import { capitalizeFirstLetter } from '../utils';
+import { getErrorMessagesPydantic } from '../utils';
 
 const props = defineProps<{
   formType: AuthForm
@@ -20,50 +20,43 @@ const passwordConfirmed = ref("");
 const warningMessage = ref("");
 const successMessage = ref("");
 
-
-
-async function formSubmitted() {
-    // Clean messages
+function cleanMessages() {
     warningMessage.value = "";
     successMessage.value = "";
+}
 
-    if (props.formType === 'signup') {
-        if (password.value !== passwordConfirmed.value) {
-            warningMessage.value = "Passwords not matching!";
+async function formSignUpSubmitted() {
+    cleanMessages()
+    if (password.value !== passwordConfirmed.value) {
+        warningMessage.value = "Passwords not matching!";
+        
+        return;
+    }
 
-            return;
+    let response: AxiosResponse;
+    try {
+        const payload = {
+            username: username.value,
+            password: password.value
         }
+        
+        response = await axios.post(`${BACKEND_URL}/auth/signup`, payload);
+        successMessage.value =  response.data.message
 
-        let response: AxiosResponse;
-        try {
-            const payload = {
-                username: username.value,
-                password: password.value
-            }
-            
-            response = await axios.post(`${BACKEND_URL}/auth/signup`, payload);
-            successMessage.value =  response.data.message
-
-            emit('signup-success')
-        } catch (error: any) {
-
-            const detail = error.response.data.detail;
-            if (Array.isArray(detail)) {  // Pydantic validation error
-                // Join all Pydantic errors
-                warningMessage.value = detail.map(err => {
-                    const fieldName: string = err.loc[err.loc.length - 1];  // Get the field name (last item in the 'loc' array)
-                    return `${capitalizeFirstLetter(fieldName)}: ${err.msg}`;
-                }).join('.\n') + '.';
-
-            } else {  // Simple error
-                warningMessage.value = detail;
-            }
+        emit('signup-success')
+    } catch (error: any) {
+        const detail = error.response.data.detail;
+        if (Array.isArray(detail)) {  // Pydantic validation error
+            warningMessage.value = getErrorMessagesPydantic(error);
+        } else {  // Simple error
+            warningMessage.value = detail;
         }
-            
+    }
+}
 
-    } else { // formType === 'login'
-
-        let response: AxiosResponse;
+async function formLogInSubmitted() {
+    cleanMessages()
+    let response: AxiosResponse;
         try {
             const payload = {
                 username: username.value,
@@ -78,14 +71,17 @@ async function formSubmitted() {
         } catch (error: any) {
             warningMessage.value = error.response.data.detail;
         }
-    }
-
 }
+
+
+
+
+
 </script>
 
 
 <template>
-    <form @submit.prevent="formSubmitted">
+    <form v-if="props.formType === 'signup'" @submit.prevent="formSignUpSubmitted">
         <label for="username">Username: <br />
         <input v-model.trim="username" type="text" id="username" name="username" required> <br />
         </label>  
@@ -94,8 +90,20 @@ async function formSubmitted() {
         <input v-model.trim="password" type="text" id="password" name="password" required> <br />
         </label>  
 
-        <label v-if="props.formType === 'signup'" for="confirm-password">Confirm password: <br />
+        <label for="confirm-password">Confirm password: <br />
         <input v-model.trim="passwordConfirmed" type="text" id="confirm-password" name="confirm" required> <br />
+        </label>  
+
+        <input type="submit" value="Submit">
+    </form>    
+
+    <form v-else @submit.prevent="formLogInSubmitted">
+        <label for="username">Username: <br />
+        <input v-model.trim="username" type="text" id="username" name="username" required> <br />
+        </label>  
+        
+        <label for="password">Password: <br />
+        <input v-model.trim="password" type="text" id="password" name="password" required> <br />
         </label>  
 
         <input type="submit" value="Submit">
