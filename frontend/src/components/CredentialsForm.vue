@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 
 import { ref } from 'vue';
+import axios, { type AxiosResponse } from 'axios';
+
 import type { AuthForm } from '../types';
+import { BACKEND_URL } from '../config';
+import { capitalizeFirstLetter } from '../utils';
 
 const props = defineProps<{
   formType: AuthForm
@@ -14,25 +18,66 @@ const password = ref("");
 const passwordConfirmed = ref("");
 
 const warningMessage = ref("");
+const successMessage = ref("");
 
 
-function formSubmitted() {
-    /* ToDo: send request to backend */
+
+async function formSubmitted() {
+    // Clean messages
+    warningMessage.value = "";
+    successMessage.value = "";
 
     if (props.formType === 'signup') {
-
         if (password.value !== passwordConfirmed.value) {
             warningMessage.value = "Passwords not matching!";
 
             return;
         }
 
-        // Clean warning messages
-        warningMessage.value = "";
+        let response: AxiosResponse;
+        try {
+            const payload = {
+                username: username.value,
+                password: password.value
+            }
+            
+            response = await axios.post(`${BACKEND_URL}/auth/signup`, payload);
+            successMessage.value =  response.data.message
+
+            emit('signup-success')
+        } catch (error: any) {
+
+            const detail = error.response.data.detail;
+            if (Array.isArray(detail)) {  // Pydantic validation error
+                // Join all Pydantic errors
+                warningMessage.value = detail.map(err => {
+                    const fieldName: string = err.loc[err.loc.length - 1];  // Get the field name (last item in the 'loc' array)
+                    return `${capitalizeFirstLetter(fieldName)}: ${err.msg}`;
+                }).join('.\n') + '.';
+
+            } else {  // Simple error
+                warningMessage.value = detail;
+            }
+        }
+            
+
     } else { // formType === 'login'
-        // Todo: request and handle response
-        const jwt = "jwt-placeholder"
-        emit('login-success', username.value, jwt)  // sends username and jwt too
+
+        let response: AxiosResponse;
+        try {
+            const payload = {
+                username: username.value,
+                password: password.value
+            }
+            
+            response = await axios.post(`${BACKEND_URL}/auth/login`, payload);
+            
+            successMessage.value = response.data.message;
+            emit('login-success', response.data.username, response.data.jwt)
+
+        } catch (error: any) {
+            warningMessage.value = error.response.data.detail;
+        }
     }
 
 }
@@ -56,17 +101,26 @@ function formSubmitted() {
         <input type="submit" value="Submit">
     </form>
 
-    <p v-if="warningMessage" class="warning">
+    <p v-if="warningMessage" class="warning message">
         {{ warningMessage }}
     </p>
 
+    <p v-if="successMessage" class="success message">
+        {{ successMessage }}
+    </p>
 
 </template>
 
 <style scoped>
+.message {
+    font-weight: bold;
+    margin-top: 1rem;
+}
 .warning {
-  color: red;
-  font-weight: bold;
-  margin-top: 1rem;
+    color: red;
+    white-space: pre-wrap;   /* So /n of the warnings are rendered too */
+}
+.success {
+    color: lightgreen;
 }
 </style>
