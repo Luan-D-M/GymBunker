@@ -66,7 +66,7 @@ async function formLogInSubmitted() {
             response = await axios.post(`${BACKEND_URL}/auth/login`, payload);
             
             successMessage.value = response.data.message;
-            emit('login-success', response.data.username, response.data.jwt)
+            emit('login-success', response.data.username, response.data.access_token)
 
         } catch (error: any) {
             warningMessage.value = error.response.data.detail;
