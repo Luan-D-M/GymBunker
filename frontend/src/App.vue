@@ -28,15 +28,27 @@ function onLoginSuccess(usernameArg: string, jwt: string) {
   router.push('/')
 }
 
-function logOut() {
+/**
+ * Logs out the user by clearing session storage and resetting state.
+ *
+ * @param goToLoginView - (Optional) If true, redirects to '/login'. 
+ * If false, redirects to '/' (Home). Defaults to false.
+ */
+function logOut(goToLoginView = false) {
   sessionStorage.removeItem('username');
   sessionStorage.removeItem('jwt');
 
   isUserLogged.value = false;
   username.value = "";
 
-  router.push('/'); 
+  router.push( goToLoginView ? '/login' : '/'); 
 }
+
+function sessionExpired() {
+  alert("Session expired. Please login again.");
+  logOut(true);
+}
+
 
 
 </script>
@@ -47,8 +59,8 @@ function logOut() {
       <RouterLink to="/">Home</RouterLink> |
       <span v-if="isUserLogged">
         <RouterLink to="/add-workout">Add Workout</RouterLink>
-        <RouterLink to="/update-workout">Update Workout</RouterLink>
-        <a href="#" @click.prevent="logOut" class="logout-btn">Logout</a>
+        <!--<RouterLink to="/update-workout">Update Workout</RouterLink>-->
+        <a href="#" @click.prevent="logOut()" class="logout-btn">Logout</a>
       </span>
       <span v-else>
         <RouterLink to="/signup">SignUp</RouterLink>
@@ -58,11 +70,14 @@ function logOut() {
     </nav>
   </header>
   <!-- The :key bellow forces the page to reload when user log out. -->
-  <RouterView :key="$route.fullPath + String(isUserLogged)" @login-success="onLoginSuccess" />
+  <RouterView :key="$route.fullPath + String(isUserLogged)"
+              @login-success="onLoginSuccess"
+              @session-expired="sessionExpired" 
+  />
 </template>
 
 <style>
-  nav {   /* ToDo: Improve navbar */
+  nav {   
       position: fixed; /* Fixes the element to the viewport */
       top: 0;
       left: 0;

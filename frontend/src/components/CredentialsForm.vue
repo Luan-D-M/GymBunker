@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 
 import { ref } from 'vue';
-import axios, { type AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
+
+import { getErrorMessagesPydantic } from '../utils';
+import api from '../api';
 
 import type { AuthForm } from '../types';
-import { BACKEND_URL } from '../config';
-import { getErrorMessagesPydantic } from '../utils';
 
 const props = defineProps<{
   formType: AuthForm
@@ -40,7 +41,7 @@ async function formSignUpSubmitted() {
             password: password.value
         }
         
-        response = await axios.post(`${BACKEND_URL}/auth/signup`, payload);
+        response = await api.post('/auth/signup', payload);
         successMessage.value =  response.data.message
 
         emit('signup-success')
@@ -63,7 +64,7 @@ async function formLogInSubmitted() {
                 password: password.value
             }
             
-            response = await axios.post(`${BACKEND_URL}/auth/login`, payload);
+            response = await api.post('/auth/login', payload);
             
             successMessage.value = response.data.message;
             emit('login-success', response.data.username, response.data.access_token)
@@ -87,11 +88,11 @@ async function formLogInSubmitted() {
         </label>  
         
         <label for="password">Password: <br />
-        <input v-model.trim="password" type="text" id="password" name="password" required> <br />
+        <input v-model.trim="password" type="password" id="password" name="password" required> <br />
         </label>  
 
         <label for="confirm-password">Confirm password: <br />
-        <input v-model.trim="passwordConfirmed" type="text" id="confirm-password" name="confirm" required> <br />
+        <input v-model.trim="passwordConfirmed" type="password" id="confirm-password" name="confirm" required> <br />
         </label>  
 
         <input type="submit" value="Submit">
@@ -103,7 +104,7 @@ async function formLogInSubmitted() {
         </label>  
         
         <label for="password">Password: <br />
-        <input v-model.trim="password" type="text" id="password" name="password" required> <br />
+        <input v-model.trim="password" type="password" id="password" name="password" required> <br />
         </label>  
 
         <input type="submit" value="Submit">
