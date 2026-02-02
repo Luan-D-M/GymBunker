@@ -48,25 +48,31 @@ function sessionExpired() {
   alert("Session expired. Please login again.");
   logOut(true);
 }
-
-
-
 </script>
 
 <template>
   <header>
     <nav>  <!-- Navigation Bar -->
-      <RouterLink to="/">Home</RouterLink> |
-      <span v-if="isUserLogged">
-        <RouterLink to="/add-workout">Add Workout</RouterLink>
-        <!--<RouterLink to="/update-workout">Update Workout</RouterLink>-->
-        <a href="#" @click.prevent="logOut()" class="logout-btn">Logout</a>
-      </span>
-      <span v-else>
-        <RouterLink to="/signup">SignUp</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </span>
+      <RouterLink to="/">
+        <img 
+          src="/Logo-NoBg.png"
+          class="nav-logo"
+          alt="GymBunker logo: a bunker beneath mountains."
+        />
+      </RouterLink>
+      <div class="nav-content">
+        <RouterLink to="/">Home</RouterLink> |
+        <span v-if="isUserLogged">
+          <RouterLink to="/add-workout">Add Workout</RouterLink>
+          <!--<RouterLink to="/update-workout">Update Workout</RouterLink>-->
+          <a href="#" @click.prevent="logOut()" class="logout-btn">Logout</a>
+        </span>
+        <span v-else>
+          <RouterLink to="/signup">SignUp</RouterLink>
+          <RouterLink to="/login">Login</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+        </span>
+      </div>
     </nav>
   </header>
   <!-- The :key bellow forces the page to reload when user log out. -->
@@ -78,30 +84,54 @@ function sessionExpired() {
 
 <style>
   nav {   
-      position: fixed; /* Fixes the element to the viewport */
-      top: 0;
-      left: 0;
-      width: 100%; 
-      background-color: #333; 
-      padding: 1rem;
-      z-index: 1000;
-    }
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; 
+    background-color: #333; 
+    z-index: 1000;
+    box-sizing: border-box;
+    
+    /* Using Grid to create 3 equal columns */
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; 
+    align-items: center;
+    padding: 10px 20px;
+    height: 90px; /* Force height to accommodate the 70px logo + padding */
+  }
+
+  .nav-logo {
+    grid-column: 1; /* Keeps logo in the first column */
+    height: 70px;
+    width: auto;
+    display: block;
+  }
+
+  .nav-content {
+    grid-column: 2; /* Forces links to the exact middle column */
+    display: flex;
+    align-items: center;
+    color: white;
+    white-space: nowrap;
+  }
 
   nav a {
     color: white;
     text-decoration: none;
-    margin-right: 15px;
+    margin: 0 10px;
   }
 
   .logout-btn {
-    color: #ff6b6b; /* Light red to indicate 'exit' */
-    margin-left: 15px;
+    color: #ff6b6b;
     cursor: pointer;
-    text-decoration: none;
   }
 
   .logout-btn:hover {
     text-decoration: underline;
   }
 
+  /* To prevent the page content from hiding under the fixed nav */
+  body {
+    padding-top: 90px;
+  }
 </style>
