@@ -44,6 +44,11 @@ function handleWorkoutView(workout: Workout) {
   router.push('/workout')
 }
 
+function handleWorkoutEdit(workout: Workout) {
+  setWorkout(workout)
+  router.push('/update-workout')
+}
+
 async function handleWorkoutDelete(workoutName: string) {
   await deleteWorkoutApi(workoutName, jwt.value);
 }
@@ -75,6 +80,7 @@ async function handleWorkoutDelete(workoutName: string) {
         ({{ workout.exercises.length }} exercises)
 
         <button @click="handleWorkoutView(workout)" style="margin-left: 10px;">View</button>
+        <button @click="handleWorkoutEdit(workout)" style="margin-left: 10px;">Edit</button>
         <button @click="handleWorkoutDelete(workout.workout_name)" style="margin-left: 5px; color: red;">Delete</button>
         
       </li>
