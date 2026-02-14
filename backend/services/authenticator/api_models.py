@@ -20,3 +20,6 @@ class UserLogIn(BaseModel):
 
 class UserDeleteAccount(BaseModel):
     password: str
+
+class HTTPError(BaseModel):   # Used by documentation
+    detail: str
