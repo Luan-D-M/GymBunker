@@ -99,6 +99,7 @@ paths:
       summary: Add a new workout
       tags: [Workouts]
       requestBody:
+        description: "The **Workout** object to create. The `workout_name` must be unique for the user."
         required: true
         content:
           application/json:
@@ -120,16 +121,18 @@ paths:
 
   # --- UPDATE WORKOUT ---
   /update-workout/{workoutName}:
+    parameters:
+      - in: path
+        name: workoutName
+        required: true
+        schema:
+          type: string
+        description: "The current name of the workout to update."
     post:
       summary: Update an existing workout
       tags: [Workouts]
-      parameters:
-        - in: path
-          name: workoutName
-          required: true
-          schema:
-            type: string
       requestBody:
+        description: "The **Workout** object with updated exercises. **Important:** The `workout_name` field in this body MUST match the `workoutName` in the URL path."
         required: true
         content:
           application/json:
@@ -143,21 +146,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserWorkoutProfile'
         400:
-          description: Validation Error
+          description: Bad Request (Invalid input or data mismatch)
         404:
           description: User or workout wasn't found.
 
   # --- DELETE WORKOUT ---
   /delete-workout/{workoutName}:
+    parameters:
+      - in: path
+        name: workoutName
+        required: true
+        schema:
+          type: string
+        description: "The name of the workout to delete."
     delete:
       summary: Delete a workout
       tags: [Workouts]
-      parameters:
-        - in: path
-          name: workoutName
-          required: true
-          schema:
-            type: string
       responses:
         200:
           description: Workout deleted successfully

@@ -50,6 +50,15 @@ export const updateWorkout = async (
     workout_name: string,
     new_workout: WorkoutDTO
 )  => {
+
+    if (workout_name !== new_workout.workout_name) {
+        throw new HttpError(
+            `Workout name mismatch. The URL parameter '${workout_name}' does not match the
+            body property '${new_workout.workout_name}'.`,
+            400
+        );
+    }
+
     const clean_workout_name = workout_name.trim()
 
     const result = await UserWorkoutsModel.findOneAndUpdate(
