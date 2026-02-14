@@ -44,6 +44,65 @@ function logOut(goToLoginView = false) {
   router.push( goToLoginView ? '/login' : '/'); 
 }
 
+import api from './api'; // Import the instance you just created
+import Swal from 'sweetalert2';
+
+async function deleteAccount() {
+  // Confirm intention
+  if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) {
+    return; // User clicked "Cancel"
+  }
+
+  // This creates a popup with a password field
+  const { value: password } = await Swal.fire({ 
+    title: 'Confirm your password to delete the account:',
+    input: 'password',
+
+    // --- Styling Options ---
+    width: '40vw',       
+    padding: '1em',             
+    background: '#2c3e50',      // Dark Blue-Gray  
+    color: '#ffffff',           // Change text color to white
+    confirmButtonColor: '#d33', // Custom button color
+    // -----------------------
+
+    inputLabel: 'Password',
+    inputPlaceholder: 'Enter your password',
+    inputAttributes: {
+      autocapitalize: 'off',
+      autocorrect: 'off'
+    },
+    showCancelButton: true
+  });
+
+  if (!password) return; // User cancelled.
+
+  try {
+    const token = sessionStorage.getItem('jwt');
+
+    await api.post('/auth/delete-account', 
+      { password },
+      {headers: { Authorization: `Bearer ${token}` }}
+    );
+
+    // On Success: Notify and Logout
+    alert("Your account has been successfully deleted.");
+    logOut();
+
+  } catch (error: any) {
+    console.error("Delete Account Error:", error);
+ 
+    if (error.response) {
+      // Server responded with a specific error message
+      const error_message = JSON.stringify(error.response.data.detail, null, 2)
+      alert(`Failed to delete: ${error_message || "Server Error"}`);
+    } else {
+      // Network error
+      alert("Network error. Could not reach the server.");
+    }
+  }
+}
+
 function sessionExpired() {
   alert("Session expired. Please login again.");
   logOut(true);
@@ -72,6 +131,17 @@ function sessionExpired() {
           <RouterLink to="/login">Login</RouterLink>
           <RouterLink to="/about">About</RouterLink>
         </span>
+      </div>
+
+      <div class="nav-right">
+        <a 
+          v-if="isUserLogged" 
+          href="#" 
+          @click.prevent="deleteAccount()" 
+          class="delete-btn"
+        >
+          Delete Account
+        </a>
       </div>
     </nav>
   </header>
@@ -121,15 +191,26 @@ function sessionExpired() {
     margin: 0 10px;
   }
 
+
   .logout-btn {
     color: #ff6b6b;
     cursor: pointer;
+    align-items: right;
   }
-
+  
   .logout-btn:hover {
     text-decoration: underline;
   }
 
+  .nav-right {
+    grid-column: 3;
+    justify-self: end; /* Pushes content to the far right */
+  }
+  
+  .delete-btn {
+      color: #871010;
+      cursor: pointer;
+  }
   /* To prevent the page content from hiding under the fixed nav */
   body {
     padding-top: 90px;

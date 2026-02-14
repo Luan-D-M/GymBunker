@@ -29,29 +29,6 @@ export function useWorkouts() {
     }
   };
 
-  /* Function is not being used. (Is it necessary?)
-  const getWorkoutByName = async (workoutName: string, token: string) => {
-    isLoading.value = true;
-    error.value = null;
-
-    try {
-      if (workouts.value.length === 0) {
-        await getWorkoutsApi(token); // Get use workouts data if needed.
-      }
-      // Search for that specific workout locally
-      const localMatch = workouts.value.find(w => w.workout_name === workoutName);
-      if (!localMatch) {
-          error.value = "Workout not found";
-      }
-      return localMatch;
-
-    } catch (err: any) {
-      error.value = err.message;
-    } finally {
-      isLoading.value = false; 
-    }
-  };
-  */
 
   // WorkoutName is unique and works akin to an id at backend.
   const deleteWorkoutApi = async (workoutName: string, token: string) => {

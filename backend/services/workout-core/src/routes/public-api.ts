@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 
 import { Workout } from '../data/schemas/workout-schema.js'
 import { getUserData, addWorkout, updateWorkout, deleteWorkout } from '../logic/workout-logic.js';
-import { HttpError } from '../utils/http-error.js';
 import { WorkoutZodSchema } from '../data/schemas/workout-zod-schema.js';
 
 // ToDo: API testing.
