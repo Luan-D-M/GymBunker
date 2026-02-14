@@ -17,6 +17,13 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: |
+        **JWT Authorization header using the Bearer scheme.**
+        
+        Enter **ONLY** your token in the text box below.
+        Do **NOT** type "Bearer " (Swagger UI adds it automatically).
+        
+        Example: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
   
   schemas:
     Exercise:
