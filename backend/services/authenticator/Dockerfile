@@ -1,5 +1,7 @@
-FROM python:3.13
+FROM python:3.13-slim
 
+# Prevents Python from writing .pyc files to disc (useless in containers)
+ENV PYTHONDONTWRITEBYTECODE=1
 # Force the stdout and stderr streams to be unbuffered --> Ensures logs shows up immediately. 
 ENV PYTHONUNBUFFERED=1
 
