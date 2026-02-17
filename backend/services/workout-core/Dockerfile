@@ -2,6 +2,9 @@ FROM node:20-slim
 
 WORKDIR /app
 
+# MongoMemoryServer needs libcurl4
+RUN apt-get update && apt-get install -y libcurl4 && rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json ./
 # npm ci is faster than npm install
 RUN npm ci
