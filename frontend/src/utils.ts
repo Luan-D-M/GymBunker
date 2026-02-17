@@ -1,6 +1,8 @@
 import type { AxiosError } from "axios";
 import type { PydanticError, PydanticResponse, ZodResponse } from "./types";
 
+import { isAxiosError } from 'axios';
+
 export function capitalizeFirstLetter(val: string): string {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
@@ -28,18 +30,17 @@ export function getErrorMessagesZod(error: AxiosError<ZodResponse>): string {
     const errorMessage = details.map((err) => {
         let fieldName = err.path;
 
-        // 1. Smart Formatting: Convert "exercises.0.weight" -> "Exercise 1 - Weight"
+        // Convert "exercises.0.weight" -> "Exercise 1 - Weight"
         if (fieldName.includes('exercises.')) {
             fieldName = fieldName.replace(/exercises\.(\d+)\./, (_, index) => {
                 return `Exercise ${Number(index) + 1} - `;
             });
         }
 
-        // 2. Clean up common snake_case (e.g. "number_sets" -> "Number sets")
+        // Clean up common snake_case (e.g. "number_sets" -> "Number sets")
         fieldName = fieldName.replace(/_/g, ' ');
 
-        // 3. Capitalize the result
-        // (Assuming you have this helper, or just use inline logic)
+        // Capitalize the result
         fieldName = capitalizeFirstLetter(fieldName); 
 
         return `${fieldName}: ${err.message}`;
@@ -47,3 +48,38 @@ export function getErrorMessagesZod(error: AxiosError<ZodResponse>): string {
 
     return errorMessage;
 }
+
+
+export function parseApiError(error: any, emitSessionExpired: () => void): string {
+
+    if (isAxiosError(error)) {
+        let errorMessage = "";
+        console.error("Axios Error:", error);
+
+        if (error.response) {
+            const responseData = error.response.data as any;
+
+            // Check if it is a Zod Validation Error
+            if (responseData.details) {
+                errorMessage = getErrorMessagesZod(error as any);
+            } else {
+                const serverMessage = responseData.detail || JSON.stringify(responseData);
+                errorMessage = `Server Error (${error.response.status}): ${serverMessage}`;
+            }
+            // Unauthorized jwt!
+            if (error.response.status === 401) {
+                emitSessionExpired();
+            }
+        } else {
+            // Network Error (Server down, Timeout, CORS)
+            errorMessage = error.message;
+        }
+
+        return errorMessage
+    }
+
+    //  Non-Axios Error
+    console.error("Unexpected Error:", error);
+    return "An unexpected error occurred.";
+}
+    
